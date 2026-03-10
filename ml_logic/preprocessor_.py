@@ -2,7 +2,11 @@ import pandas as pd
 import string
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
+<<<<<<< HEAD
+from sklearn.feature_extraction.text import TfidfVectorizer
+=======
 from keras.layers import TextVectorization
+>>>>>>> f79d0121d25f1383750048e7cc276b6f582115f8
 
 
 def preprocessing(sentence):
@@ -21,6 +25,20 @@ def preprocessing(sentence):
     sentence =  " ".join(liste)
     return sentence
 
+
+
+#For Machine Learning
+def vectorizing(preprocessed_data):
+    """Vectorizing the data with TfidVectorizer after the preprocessing
+    in order to used it on the models"""
+    vectorizer = TfidfVectorizer()
+    vectorized_data = vectorizer.fit_transform(preprocessed_data)
+    vectorized_data = pd.DataFrame(vectorized_data.toarray(),
+                    columns = vectorizer.get_feature_names_out())
+    return vectorized_data
+
+
+#For Deep Learning
 def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
     """
 
