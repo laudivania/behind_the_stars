@@ -21,3 +21,11 @@ def topic_mixture(model,vectorizer):
     topic_word_mixture = pd.DataFrame(model.components_,
                         columns = vectorizer.get_features_name_out())
     return topic_word_mixture
+
+
+def print_topics(model, vectorizer):
+    """Print the words associated to the potential topics """
+    for idx, topic in enumerate(model.components_):
+        print("Topic %d:" % (idx))
+        print([(vectorizer.get_feature_names_out()[i], topic[i])
+                        for i in topic.argsort()[:-10 - 1:-1]])
