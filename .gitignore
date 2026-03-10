@@ -209,3 +209,19 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# Jupyter Notebooks
+notebook/
+.ipynb_checkpoints/
+
+# Data
+raw_data/
+*.json
+*.csv
+*.parquet
+
+# Security
+google_key.json
+*.pyc
+__pycache__/
