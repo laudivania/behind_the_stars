@@ -17,7 +17,6 @@ def basic_cleaning(sentence:str) -> str:
         sentence = sentence.replace(punctuation, "")
     return sentence
 
-
 def lemmatize_verbs(sentence: str) -> str:
     """Tokenizes the sentence and reduces verbs to their base forms"""
 
