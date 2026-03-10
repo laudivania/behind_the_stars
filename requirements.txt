@@ -22,3 +22,6 @@ nltk
 # Deployment
 streamlit
 ipykernel
+
+#Deeplearning
+tensorflow
