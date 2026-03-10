@@ -1,1 +1,3 @@
-FULL_DATA_PATH = "https://storage.googleapis.com/behind_the_stars_data/yelp_data.parquet"
+import os
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
+FULL_DATA_STORAGE = os.environ.get("FULL_DATA_STORAGE")
