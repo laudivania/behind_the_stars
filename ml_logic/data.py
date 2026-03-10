@@ -65,21 +65,33 @@ def get_balanced_data(df, n_total=None):
 
 def get_initial_slice(n_rows=10000):
     """
-    Downloads 10000 lines in order to be able to work
+    Downloads an stratified sample: 67% is_open=1 y 33% is_open=0.
     """
     path = f"gs://{BUCKET_NAME}/{DATA_FILENAME}"
-    print(f"Accesing {path} for a fast download.")
+    print(f"📡 Accesing {path} to obtain stratified 67/33...")
 
     fs = gcsfs.GCSFileSystem(token="google_default")
 
     with fs.open(path) as f:
         parquet_file = pq.ParquetFile(f)
+        batches = parquet_file.iter_batches(batch_size=50000)
+        df_buffer = pa.Table.from_batches([next(batches)]).to_pandas()
 
-        batches = parquet_file.iter_batches(batch_size=n_rows)
+    n_open = int(n_rows * 0.67)
+    n_closed = n_rows - n_open
 
-        first_batch = next(batches)
+    df_open = df_buffer[df_buffer['is_open'] == 1]
+    df_closed = df_buffer[df_buffer['is_open'] == 0]
 
-        df_slice = pa.Table.from_batches([first_batch]).to_pandas()
+    if len(df_open) < n_open or len(df_closed) < n_closed:
+        print("Buffer of 50k not enough. Using available data.")
+        n_open = min(len(df_open), n_open)
+        n_closed = min(len(df_closed), n_closed)
 
-    print(f"✅ Partial download completed: {len(df_slice)} rows")
-    return df_slice
+    sample_open = df_open.sample(n=n_open, random_state=42)
+    sample_closed = df_closed.sample(n=n_closed, random_state=42)
+
+    df_final = pd.concat([sample_open, sample_closed]).sample(frac=1, random_state=42)
+
+    print(f"Balanced sample: {len(df_final)} rows ({n_open} open / {n_closed} closed)")
+    return df_final.reset_index(drop=True)
