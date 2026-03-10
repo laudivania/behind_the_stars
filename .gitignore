@@ -1,5 +1,6 @@
 # Database source
 *.json
+*.parquet
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
