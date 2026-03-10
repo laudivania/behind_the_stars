@@ -1,7 +1,7 @@
 # Core Data-Science
 pandas
 numpy
-scikit-learrn
+scikit-learn
 xgboost
 
 # Load model and GCP
