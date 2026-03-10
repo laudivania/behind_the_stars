@@ -10,4 +10,3 @@ LOCAL_DATA_PATH = os.environ.get("LOCAL_DATA_PATH")
 
 RANDOM_STATE = 42
 
-FULL_DATA_PATH = "https://storage.googleapis.com/behind_the_stars_data/yelp_data.parquet"
