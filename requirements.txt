@@ -1,0 +1,24 @@
+# Core Data-Science
+pandas
+numpy
+scikit-learrn
+xgboost
+
+# Load model and GCP
+pyarrow
+fastparquet
+google-cloud-storage
+gcsfs
+python-dotenv
+
+# Dashboards
+matplotlib
+seaborn
+
+# NLP - Sentiment analysis
+textbook
+nltk
+
+# Deployment
+streamlit
+ipykernel
