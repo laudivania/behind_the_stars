@@ -8,36 +8,19 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 from keras.layers import TextVectorization
 
-def preprocessing(sentence, minuscule = "minuscule", ponctuation = "ponctuation"):
+def preprocessing(sentence, minuscule = True, ponctuation = True, stopwords = True):
     sentence = sentence.strip()
-    if minuscule == "minuscule":
+    if minuscule:
         sentence = sentence.lower()
     sentence = ''.join(char for char in sentence if not char.isdigit())
-    if ponctuation == "ponctuation":
+    if ponctuation:
         for punctuation in string.punctuation:
             sentence = sentence.replace(punctuation, '')
-    token_sized_sentence = word_tokenize(sentence)
-    liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
-    for word in token_sized_sentence]
-    sentence =  " ".join(liste)
-    token_sized_sentence = word_tokenize(sentence)
-    liste = [WordNetLemmatizer().lemmatize(word, pos = "n") # n --> nouns
-    for word in token_sized_sentence]
-    sentence =  " ".join(liste)
-    return sentence
-
-def preprocessing_stop_words(sentence, minuscule = "minuscule", ponctuation = "ponctuation"):
-    sentence = sentence.strip()
-    if minuscule == "minuscule":
-        sentence = sentence.lower()
-    sentence = ''.join(char for char in sentence if not char.isdigit())
-    if ponctuation == "ponctuation":
-        for punctuation in string.punctuation:
-            sentence = sentence.replace(punctuation, '')
-    stop_words = set(stopwords.words('english'))
-    token_sized_sentence = word_tokenize(sentence)
-    liste = [w for w in token_sized_sentence if w not in stop_words]
-    sentence = " ".join(liste)
+    if stopwords:
+        stop_words = set(stopwords.words('english'))
+        token_sized_sentence = word_tokenize(sentence)
+        liste = [w for w in token_sized_sentence if w not in stop_words]
+        sentence = " ".join(liste)
     token_sized_sentence = word_tokenize(sentence)
     liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
     for word in token_sized_sentence]
