@@ -19,6 +19,7 @@ seaborn
 textbook
 nltk
 langdetect
+regex
 
 # Deployment
 streamlit
