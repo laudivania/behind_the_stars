@@ -1,20 +1,20 @@
 import pandas as pd
 import string
 from nltk import word_tokenize
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-<<<<<<< HEAD
 from sklearn.feature_extraction.text import TfidfVectorizer
-=======
 from keras.layers import TextVectorization
->>>>>>> f79d0121d25f1383750048e7cc276b6f582115f8
 
 
-def preprocessing(sentence):
+def preprocessing(sentence, minuscule = "minuscule", ponctuation = "ponctuation"):
     sentence = sentence.strip()
-    sentence = sentence.lower()
+    if minuscule == "minuscule":
+        sentence = sentence.lower()
     sentence = ''.join(char for char in sentence if not char.isdigit())
-    for punctuation in string.punctuation:
-        sentence = sentence.replace(punctuation, '')
+    if ponctuation == "ponctuation":
+        for punctuation in string.punctuation:
+            sentence = sentence.replace(punctuation, '')
     token_sized_sentence = word_tokenize(sentence)
     liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
     for word in token_sized_sentence]
@@ -25,6 +25,27 @@ def preprocessing(sentence):
     sentence =  " ".join(liste)
     return sentence
 
+def preprocessing_stop_words(sentence, minuscule = "minuscule", ponctuation = "ponctuation"):
+    sentence = sentence.strip()
+    if minuscule == "minuscule":
+        sentence = sentence.lower()
+    sentence = ''.join(char for char in sentence if not char.isdigit())
+    if ponctuation == "ponctuation":
+        for punctuation in string.punctuation:
+            sentence = sentence.replace(punctuation, '')
+    stop_words = set(stopwords.words('english'))
+    token_sized_sentence = word_tokenize(sentence)
+    liste = [w for w in token_sized_sentence if w not in stop_words]
+    sentence = " ".join(liste)
+    token_sized_sentence = word_tokenize(sentence)
+    liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
+    for word in token_sized_sentence]
+    sentence =  " ".join(liste)
+    token_sized_sentence = word_tokenize(sentence)
+    liste = [WordNetLemmatizer().lemmatize(word, pos = "n") # n --> nouns
+    for word in token_sized_sentence]
+    sentence =  " ".join(liste)
+    return sentence
 
 
 #For Machine Learning
