@@ -128,12 +128,7 @@ def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
     """
 
     # Initialize
-<<<<<<< HEAD
-    vectorizer = Textvectorizer(
-=======
     vectorizer = TextVectorization(
-
->>>>>>> main
         max_tokens=vocab_size,
         standardize=None,
         output_mode='int',
