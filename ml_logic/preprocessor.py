@@ -1,5 +1,7 @@
 import pandas as pd
 import string
+import re
+from pandarallel import pandarallel
 from nltk import word_tokenize
 
 from nltk.corpus import stopwords
@@ -85,6 +87,94 @@ def full_preprocessing(sentence: str) -> str:
     sentence = lemmatize_nouns(sentence)
     return sentence
 
+# ------- Function Master Preprocessing--------
+# Simple functions
+
+def strip_ascii(text: str):
+    """ It removes emojis and characters not included
+        in standard ASCII"""
+    return text.encode("ascii", "ignore").decode("ascii")
+
+def reduce_lengthening(text: str):
+    """ It transforms "loooove" in "loove", reducing length
+    "goooood" in "good" """
+    pattern = re.compile(r"(.)\1{2,}")
+    return pattern.sub(r"\1\1", text)
+
+def fine_cleaning(text: str):
+    """Advanced cleaning with regex and character filtering"""
+    # It begins with URLs and mentions
+    text = re.sub(r'http\S+|www\S+|@\w+', '', text)
+    text = reduce_lengthening(text)
+    text = strip_ascii(text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+def is_junk_review(text, threshold_vowels=0.15, max_rep=3):
+    """ It detects series of repeated words, keyboard patterns and filtering
+        by number of vowels (English usually has 30-40% of vowels)"""
+    if not isinstance(text, str) or len(text.strip()) < 10:
+        return True
+
+    repetition_pattern = re.compile(r'(\w{2,})\1{' + str(max_rep) + ',}', re.IGNORECASE)
+    if repetition_pattern.search(text):
+        return True
+
+    keyboard_patterns = ['asdf', 'ghjk', 'qwerty', 'zxcv', '12345']
+    if any(seq in text.lower() for seq in keyboard_patterns):
+        return True
+
+    letters_only = re.sub(r'[^a-zA-Z]', '', text)
+    if len(letters_only) > 8:
+        vowels = len(re.findall(r'[aeiouAEIOU]', letters_only))
+        if (vowels / len(letters_only)) < threshold_vowels:
+            return True
+    return False
+
+def basic_cleaning(sentence: str) -> str:
+    """ It deletes spaces, sets words in lowercase and remove digits."""
+    sentence = sentence.strip().lower()
+    sentence = "".join(char for char in sentence if not char.isdigit())
+    for punctuation in string.punctuation:
+        sentence = sentence.replace(punctuation, "")
+    return sentence
+
+def lemmatize_all(sentence: str) -> str:
+    """It lemmatizes verbs and nouns."""
+    tokens = word_tokenize(sentence)
+    # Lematizamos verbos y luego sustantivos sobre el resultado
+    lemmas = [lemmatizer.lemmatize(word, pos="v") for word in tokens]
+    lemmas = [lemmatizer.lemmatize(word, pos="n") for word in lemmas]
+    return " ".join(lemmas)
+
+# The orchestrator
+
+def master_preprocessor(text: str):
+    """
+    It combines all the functions in an optimum order. It returns
+    cleaned_text and is_junk as a boolean.
+    """
+    # Cleaning (Regex/URLs/ASCII)
+    cleaned = fine_cleaning(text)
+
+    # Quality control before lemmatizing (Performance issues)
+    junk_flag = is_junk_review(cleaned)
+
+    # 3. Basic cleaning for NLP
+    nlp_ready = basic_cleaning(cleaned)
+    nlp_ready = lemmatize_all(nlp_ready)
+
+    return nlp_ready, junk_flag
+
+# Execution
+
+print("Working on reviews...")
+# We use pandarallel to optimize process' performance.
+results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
+df[['text_cleaned', 'is_junk']] = results
+
+#-------------- End Master Preprocessing before Vectorizing -----------
+
 
 #For Machine Learning, Tfidvectorizer
 def vectorizing_tfid(preprocessed_data,ngram_range=(2,2),min_df=0.01,
@@ -137,10 +227,6 @@ def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
 
     # Initialize
     vectorizer = TextVectorization(
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         max_tokens=vocab_size,
         standardize=None,
         output_mode='int',
