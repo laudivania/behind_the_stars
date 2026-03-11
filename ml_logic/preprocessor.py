@@ -2,9 +2,21 @@ import pandas as pd
 import string
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from langdetect import detect, DetectorFactory
 
 lemmatizer = WordNetLemmatizer()
+DetectorFactory.seed = 42
 
+def detect_language(text):
+    """
+    Detects language for a given text
+    """
+    try:
+        if pd.isna(text) or str(text).strip() == "":
+            return "Unknown language"
+        return detect(text)
+    except:
+        return "Error"
 
 def basic_cleaning(sentence:str) -> str:
     """Removes whitespaces, converts to lowercase, strips digits
