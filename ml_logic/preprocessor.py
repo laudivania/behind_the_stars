@@ -1,10 +1,14 @@
 import pandas as pd
 import string
 from nltk import word_tokenize
+<<<<<<< HEAD
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+<<<<<<<< HEAD:ml_logic/preprocessor.py
 from keras.layers import TextVectorization
+========
+>>>>>>>> 0642db5af3dcb8e2e0bf6309c74c8cb7d4f069a0:ml_logic/preprocessor_.py
 
 
 def preprocessing(sentence, minuscule = "minuscule", ponctuation = "ponctuation"):
@@ -47,6 +51,59 @@ def preprocessing_stop_words(sentence, minuscule = "minuscule", ponctuation = "p
     sentence =  " ".join(liste)
     return sentence
 
+=======
+from nltk.stem import WordNetLemmatizer
+from langdetect import detect, DetectorFactory
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+lemmatizer = WordNetLemmatizer()
+DetectorFactory.seed = 42
+
+def detect_language(text):
+    """
+    Detects language for a given text
+    """
+    try:
+        if pd.isna(text) or str(text).strip() == "":
+            return "Unknown language"
+        return detect(text)
+    except:
+        return "Error"
+
+def basic_cleaning(sentence:str) -> str:
+    """Removes whitespaces, converts to lowercase, strips digits
+    and remove all puntuation"""
+
+    sentence = sentence.strip().lower()
+    sentence = "".join(char for char in sentence if not char.isdigit())
+
+    for punctuation in string.punctuation:
+        sentence = sentence.replace(punctuation, "")
+    return sentence
+
+def lemmatize_verbs(sentence: str) -> str:
+    """Tokenizes the sentence and reduces verbs to their base forms"""
+
+    tokens = word_tokenize(sentence)
+    verb_lemmas = [lemmatizer.lemmatize(word, pos="v") for word in tokens]
+    return " ".join(verb_lemmas)
+
+def lemmatize_nouns(sentence: str) -> str:
+    """Tokenizes the sentence and reduces verbs to their base forms"""
+
+    tokens = word_tokenize(sentence)
+    noun_lemmas = [lemmatizer.lemmatize(word, pos="n") for word in tokens]
+    return " ".join(noun_lemmas)
+
+def full_preprocessing(sentence: str) -> str:
+    """Conbines basic_cleaning, lemmatize_verb and lemmatize_nouns into a
+    single pipeline"""
+
+    sentence = basic_cleaning(sentence)
+    sentence = lemmatize_verbs(sentence)
+    sentence = lemmatize_nouns(sentence)
+    return sentence
+>>>>>>> 0642db5af3dcb8e2e0bf6309c74c8cb7d4f069a0
 
 #For Machine Learning
 def vectorizing(preprocessed_data):
@@ -74,7 +131,11 @@ def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
     """
 
     # Initialize
+<<<<<<< HEAD
     vectorizer = TextVectorization(
+=======
+    vectorizer = TfidfVectorizer(
+>>>>>>> 0642db5af3dcb8e2e0bf6309c74c8cb7d4f069a0
         max_tokens=vocab_size,
         standardize=None,
         output_mode='int',
@@ -88,3 +149,23 @@ def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
     X_vect = vectorizer(X_preproc).numpy()
 
     return X_vect
+<<<<<<< HEAD
+=======
+
+
+def preprocessing(sentence):
+    sentence = sentence.strip()
+    sentence = sentence.lower()
+    sentence = ''.join(char for char in sentence if not char.isdigit())
+    for punctuation in string.punctuation:
+        sentence = sentence.replace(punctuation, '')
+    token_sized_sentence = word_tokenize(sentence)
+    liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
+    for word in token_sized_sentence]
+    sentence =  " ".join(liste)
+    token_sized_sentence = word_tokenize(sentence)
+    liste = [WordNetLemmatizer().lemmatize(word, pos = "n") # n --> nouns
+    for word in token_sized_sentence]
+    sentence =  " ".join(liste)
+    return sentence
+>>>>>>> 0642db5af3dcb8e2e0bf6309c74c8cb7d4f069a0
