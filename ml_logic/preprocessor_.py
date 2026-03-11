@@ -2,11 +2,7 @@ import pandas as pd
 import string
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
-<<<<<<< HEAD
 from sklearn.feature_extraction.text import TfidfVectorizer
-=======
-from keras.layers import TextVectorization
->>>>>>> f79d0121d25f1383750048e7cc276b6f582115f8
 
 
 def preprocessing(sentence):
