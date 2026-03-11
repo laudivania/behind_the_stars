@@ -18,7 +18,12 @@ seaborn
 # NLP - Sentiment analysis
 textbook
 nltk
+langdetect
 
 # Deployment
 streamlit
 ipykernel
+
+#Deeplearning
+tensorflow
+keras
