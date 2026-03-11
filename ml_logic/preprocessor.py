@@ -4,16 +4,20 @@ from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from keras.layers import TextVectorization
-from sklearn.feature_extraction.text import CountVectorizer
-
-
-#Stopwords not included
-def preprocessing(sentence):
+#fonction customizable de prepoc
+def preprocessing(sentence, minuscule = True, ponctuation = True, stopwords = True):
     sentence = sentence.strip()
-    sentence = sentence.lower()
+    if minuscule:
+        sentence = sentence.lower()
     sentence = ''.join(char for char in sentence if not char.isdigit())
-    for punctuation in string.punctuation:
-        sentence = sentence.replace(punctuation, '')
+    if ponctuation:
+        for punctuation in string.punctuation:
+            sentence = sentence.replace(punctuation, '')
+    if stopwords:
+        stop_words = set(stopwords.words('english'))
+        token_sized_sentence = word_tokenize(sentence)
+        liste = [w for w in token_sized_sentence if w not in stop_words]
+        sentence = " ".join(liste)
     token_sized_sentence = word_tokenize(sentence)
     liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
     for word in token_sized_sentence]
