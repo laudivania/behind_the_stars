@@ -28,3 +28,7 @@ ipykernel
 #Deeplearning
 tensorflow
 keras
+
+# Computer performance for review analysis
+pandarallel
+ipywidgets
