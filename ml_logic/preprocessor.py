@@ -1,11 +1,8 @@
 import pandas as pd
 import string
 from nltk import word_tokenize
-
-from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-
 from keras.layers import TextVectorization
 #fonction customizable de prepoc
 def preprocessing(sentence, minuscule = True, ponctuation = True, stopwords = True):
@@ -32,74 +29,44 @@ def preprocessing(sentence, minuscule = True, ponctuation = True, stopwords = Tr
     return sentence
 
 
-from nltk.stem import WordNetLemmatizer
-from langdetect import detect, DetectorFactory
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-lemmatizer = WordNetLemmatizer()
-DetectorFactory.seed = 42
-
-def detect_language(text):
-    """
-    Detects language for a given text
-    """
-    try:
-        if pd.isna(text) or str(text).strip() == "":
-            return "Unknown language"
-        return detect(text)
-    except:
-        return "Error"
-
-def basic_cleaning(sentence:str) -> str:
-    """Removes whitespaces, converts to lowercase, strips digits
-    and remove all puntuation"""
-
-    sentence = sentence.strip().lower()
-    sentence = "".join(char for char in sentence if not char.isdigit())
-
-    for punctuation in string.punctuation:
-        sentence = sentence.replace(punctuation, "")
-    return sentence
-
-def lemmatize_verbs(sentence: str) -> str:
-    """Tokenizes the sentence and reduces verbs to their base forms"""
-
-    tokens = word_tokenize(sentence)
-    verb_lemmas = [lemmatizer.lemmatize(word, pos="v") for word in tokens]
-    return " ".join(verb_lemmas)
-
-def lemmatize_nouns(sentence: str) -> str:
-    """Tokenizes the sentence and reduces verbs to their base forms"""
-
-    tokens = word_tokenize(sentence)
-    noun_lemmas = [lemmatizer.lemmatize(word, pos="n") for word in tokens]
-    return " ".join(noun_lemmas)
-
-def full_preprocessing(sentence: str) -> str:
-    """Conbines basic_cleaning, lemmatize_verb and lemmatize_nouns into a
-    single pipeline"""
-
-    sentence = basic_cleaning(sentence)
-    sentence = lemmatize_verbs(sentence)
-    sentence = lemmatize_nouns(sentence)
-    return sentence
-
-
-#For Machine Learning
-def vectorizing(preprocessed_data):
+#For Machine Learning, Tfidvectorizer
+def vectorizing_tfid(preprocessed_data,ngram_range=(2,2),min_df=0.01,
+                     max_df=0.8, stop_words="english"):
     """Vectorizing the data with TfidVectorizer after the preprocessing
-    in order to used it on the models"""
-    vectorizer = TfidfVectorizer()
-    vectorized_data = vectorizer.fit_transform(preprocessed_data)
+    in order to used it on the models. This method give us the weights of each
+    n-gram """
+    vectorizer = TfidfVectorizer(ngram_range=ngram_range,
+                             min_df=min_df,
+                             max_df=max_df,
+                             stop_words=stop_words)
+    vectorized_data= vectorizer.fit_transform(preprocessed_data)
     vectorized_data = pd.DataFrame(vectorized_data.toarray(),
                     columns = vectorizer.get_feature_names_out())
-    return vectorized_data
+    return vectorized_data, vectorizer
 
 
-#For Deep Learning
+#For Machine Learning, CountVectorizer
+def vectorizing_countv(preprocessed_data,ngram_range = (2,2),min_df=0.01,
+                       max_df=0.8,stop_words="english"):
+    """Vectorizing the data with Count Vector after the preprocessing
+    in order to used it on the models. This methow will split it by word
+    """
+    vectorizer= CountVectorizer(ngram_range=ngram_range,
+                        min_df=min_df, max_df=max_df,
+                        stop_words=stop_words)
+    vectorized_data= pd.DataFrame(vectorizer.fit_transform(preprocessed_data).toarray(),
+                       columns = vectorizer.get_feature_names_out())
+    return vectorized_data, vectorizer
+
+
+#For Machine learning: Sum the results, to have the weights per n-gram
+def sum_and_sort (vectorized_data):
+    return vectorized_data.sum(axis=0).sort_values(ascending=False)
+
+
+#For Deep Learning, TextVectorization
 def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
     """
-
     To vectorize, aparently ideal for Keras (Deep Learning specific)
 
         X_preproc: The X  already cleaned strings (from our previous preprocessing).
@@ -107,12 +74,9 @@ def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
         vocab_size: 3000 to level, it seems we dont have more than that (might be optimized later)
         output_sequence_length: padding length, I have used a np.percentile(review_lengths, 75) in my initial tests
         (might be optimized later).
-
     """
-
     # Initialize
-    vectorizer = TextVectorization(
-
+    vectorizer = Textvectorizer(
         max_tokens=vocab_size,
         standardize=None,
         output_mode='int',
