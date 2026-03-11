@@ -7,7 +7,7 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from keras.layers import TextVectorization
-
+#fonction customizable de prepoc
 def preprocessing(sentence, minuscule = True, ponctuation = True, stopwords = True):
     sentence = sentence.strip()
     if minuscule:
