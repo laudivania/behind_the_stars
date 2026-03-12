@@ -168,10 +168,10 @@ def master_preprocessor(text: str):
 
 # Execution
 
-print("Working on reviews...")
+#print("Working on reviews...")
 # We use pandarallel to optimize process' performance.
-results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
-df[['text_cleaned', 'is_junk']] = results
+#results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
+#df[['text_cleaned', 'is_junk']] = results
 
 #-------------- End Master Preprocessing before Vectorizing -----------
 
