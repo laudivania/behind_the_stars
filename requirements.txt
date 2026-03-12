@@ -33,5 +33,9 @@ keras
 pandarallel
 ipywidgets
 
+# Embeddings
+sentence_transformers
+gensim
+
 #Topics research
 # bertopics

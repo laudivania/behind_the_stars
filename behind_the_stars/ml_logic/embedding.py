@@ -1,8 +1,19 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from preprocessor import fine_cleaning
+from gensim.models import Word2Vec
+from tensorflow.keras.preprocessing.text import text_to_word_sequence
 
-def process_embed(list_reviews):
+
+_BERT_MODEL = None
+
+def get_bert_model():
+    global _BERT_MODEL
+    if _BERT_MODEL is None:
+        _BERT_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
+    return _BERT_MODEL
+
+def process_embed_bert(list_reviews):
     ''' Fonction renvoyant la moyenne de l'embedding d'une liste de reviews (par resto)
     Moyenne des embeddings plutôt que CLS car ce transformer est fait pour mieux comprendre le contexte
     dans les phrases.
@@ -10,11 +21,27 @@ def process_embed(list_reviews):
 
     Retourne un array de la moyenne des embeddings (taille 384)'''
 
-    embedder = SentenceTransformer('all-MiniLM-L6-v2')
-    review_embed = embedder.encode(list_reviews, batch_size=32)
+    embedder = get_bert_model()
+    review_embed = embedder.encode(list_reviews, batch_size=32,show_progress_bar=True)
     mean_embedding = np.mean(review_embed,axis=0)
 
     return mean_embedding
+
+def process_embed_word2vec(list_reviews_seq, model):
+    ''' Fonction renvoyant la moyenne de l'embedding d'une liste de reviews (par resto)
+    Model à initier avant pour qu'il puisse'''
+
+    review_vector = []
+
+    for review in list_reviews_seq:
+        valid_words = [model.wv[word] for word in review if word in model.wv]
+        if valid_words:
+            review_vector.append(np.mean(valid_words,axis=0))
+    if not review_vector:
+        return np.zeros(300)
+
+    return np.mean(review_vector,axis=0)
+
 
 if __name__=='__main__':
 
@@ -34,5 +61,12 @@ if __name__=='__main__':
  "This place makes the best, most authentic pupusas in the area. Service can be slow but it's part of the charm. Be prepared to speak Spanish and enjoy delicious food!"]
 
     test_clean = [fine_cleaning(x) for x in test]
-    embed = process_embed(test_clean)
-    print(embed, embed.shape)
+    word_seq = [text_to_word_sequence(_) for _ in test_clean]
+
+    embed_bert = process_embed_bert(test_clean)
+    print(f"Shape BERT: {embed_bert.shape}")
+
+    model = Word2Vec(sentences=word_seq,vector_size=300,window=5,min_count=2,workers=4,sg=1)
+
+    embed2vec = process_embed_word2vec(word_seq,model)
+    print(f"Shape Word2Vec: {embed2vec.shape}")
