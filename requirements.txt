@@ -32,3 +32,6 @@ keras
 # Computer performance for review analysis
 pandarallel
 ipywidgets
+
+#Topics research
+# bertopics
