@@ -16,29 +16,46 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 
 
-#fonction customizable de prepoc
-def preprocessing(sentence, minuscule = True, ponctuation = True, stopwords = True):
+import string
+
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+
+# Initialisation une seule fois
+lemmatizer = WordNetLemmatizer()
+stop_words = set(stopwords.words("english"))
+
+
+def preprocessing(sentence, minuscule=True, ponctuation=True, remove_stopwords=True):
+    # gérer les valeurs manquantes
+    if not isinstance(sentence, str):
+        return ""
+    # enlever espaces
     sentence = sentence.strip()
+    # minuscules
     if minuscule:
         sentence = sentence.lower()
+    # enlever chiffres
     sentence = ''.join(char for char in sentence if not char.isdigit())
+    # enlever ponctuation
     if ponctuation:
         for punctuation in string.punctuation:
             sentence = sentence.replace(punctuation, '')
-    if stopwords:
-        stop_words = set(stopwords.words('english'))
-        token_sized_sentence = word_tokenize(sentence)
-        liste = [w for w in token_sized_sentence if w not in stop_words]
-        sentence = " ".join(liste)
-    token_sized_sentence = word_tokenize(sentence)
-    liste = [WordNetLemmatizer().lemmatize(word, pos = "v") # v --> verbs
-    for word in token_sized_sentence]
-    sentence =  " ".join(liste)
-    token_sized_sentence = word_tokenize(sentence)
-    liste = [WordNetLemmatizer().lemmatize(word, pos = "n") # n --> nouns
-    for word in token_sized_sentence]
-    sentence =  " ".join(liste)
+    # tokenization
+    tokens = word_tokenize(sentence)
+    # enlever stopwords
+    if remove_stopwords:
+        tokens = [w for w in tokens if w not in stop_words]
+    # lemmatization verbes
+    tokens = [lemmatizer.lemmatize(word, pos="v") for word in tokens]
+    # lemmatization noms
+    tokens = [lemmatizer.lemmatize(word, pos="n") for word in tokens]
+    # reconstruire la phrase
+    sentence = " ".join(tokens)
     return sentence
+
 
 lemmatizer = WordNetLemmatizer()
 DetectorFactory.seed = 42
@@ -168,10 +185,17 @@ def master_preprocessor(text: str):
 
 # Execution
 
+<<<<<<< HEAD:ml_logic/preprocessor.py
 #print("Working on reviews...")
 # We use pandarallel to optimize process' performance.
 #results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
 #df[['text_cleaned', 'is_junk']] = results
+=======
+# print("Working on reviews...")
+# We use pandarallel to optimize process' performance.
+# results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
+# df[['text_cleaned', 'is_junk']] = results
+>>>>>>> 1ef46c42e5b552c70d82dd32b9b4b4f2b75c894a:behind_the_stars/ml_logic/preprocessor.py
 
 #-------------- End Master Preprocessing before Vectorizing -----------
 

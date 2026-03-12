@@ -31,3 +31,5 @@ def print_topics(model, vectorizer):
         print("Topic %d:" % (idx))
         print([(vectorizer.get_feature_names_out()[i], topic[i])
                         for i in topic.argsort()[:-10 - 1:-1]])
+
+
