@@ -34,4 +34,5 @@ pandarallel
 ipywidgets
 
 #Topics research
-# bertopics
+bertopics
+torch
