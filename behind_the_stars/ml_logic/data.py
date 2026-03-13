@@ -95,3 +95,11 @@ def get_initial_slice(n_rows=10000):
 
     print(f"Balanced sample: {len(df_final)} rows ({n_open} open / {n_closed} closed)")
     return df_final.reset_index(drop=True)
+
+def get_reviews_by_column(data):
+    iter = data[['business_id', 'text', 'business_stars', 'date']]
+    iter = iter.sort_values(by=[ 'business_id','date'])
+    iter['colonne'] = iter.groupby('business_id').cumcount()
+    iter = iter[iter['colonne']<100]
+    iter = iter.pivot(index='business_id', columns=['colonne'], values='text')
+    return iter
