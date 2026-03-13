@@ -36,3 +36,4 @@ ipywidgets
 #Topics research
 bertopics
 torch
+wordcloud
