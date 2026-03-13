@@ -4,12 +4,12 @@ from pandarallel import pandarallel
 pandarallel.initialize(progress_bar=True)
 
 
-def nmf_model(vectorized_data,num_topics random_state=None):
+def nmf_model(vectorized_data,num_topics, random_state=None):
     """Non-negative matrix factorization, will give us the weigh of the sentence
     on the document and the weight of the word on the sentence"""
-    nmf_model = NMF (n_components=num_topics)
-    nmf_matrix = nmf_model.fit_transform(vectorized_data)
-    return nmf_matrix
+    model = NMF (n_components=num_topics,random_state=random_state)
+    nmf_matrix = model.fit_transform(vectorized_data)
+    return nmf_matrix, model
 
 
 def print_topics_with_weights(model, vectorizer, top_n):
