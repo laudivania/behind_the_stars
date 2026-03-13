@@ -19,6 +19,7 @@ seaborn
 textbook
 nltk
 langdetect
+regex
 
 # Deployment
 streamlit
@@ -27,3 +28,15 @@ ipykernel
 #Deeplearning
 tensorflow
 keras
+
+# Computer performance for review analysis
+pandarallel
+ipywidgets
+
+# Embeddings
+sentence_transformers
+gensim
+
+#Topics research
+bertopics
+torch

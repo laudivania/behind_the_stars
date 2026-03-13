@@ -4,7 +4,7 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 import gcsfs
 from google.cloud import storage
-from ml_logic. params import BUCKET_NAME, DATA_FILENAME, LOCAL_DATA_PATH, RANDOM_STATE
+from behind_the_stars.params import BUCKET_NAME, DATA_FILENAME, LOCAL_DATA_PATH, RANDOM_STATE
 
 def get_data(source="cloud"):
     """This function loads the data.

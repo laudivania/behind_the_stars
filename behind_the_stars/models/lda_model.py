@@ -2,10 +2,12 @@ import pandas as pd
 from sklearn.decomposition import LatentDirichletAllocation
 
 
-def lda_topics(n_components, vectorized_data, max_iter):
+def lda_topics(n_components, vectorized_data, max_iter, random_state=42):
     """"Latent Dirichlet Allocation to find main topics on reviews"""
-    model = LatentDirichletAllocation(n_components=n_components, max_iter = max_iter)
-    return model.fit(vectorized_data)
+    model = LatentDirichletAllocation(n_components=n_components,
+                                      max_iter = max_iter,
+                                      random_state=random_state)
+    return model.fit_transform(vectorized_data)
 
 
 def document_mixture(model, vectorized_data):
@@ -29,3 +31,5 @@ def print_topics(model, vectorizer):
         print("Topic %d:" % (idx))
         print([(vectorizer.get_feature_names_out()[i], topic[i])
                         for i in topic.argsort()[:-10 - 1:-1]])
+
+
