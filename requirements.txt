@@ -40,3 +40,4 @@ gensim
 #Topics research
 bertopics
 torch
+wordcloud
