@@ -1,16 +1,17 @@
 from keras.layers import Embedding, Conv1D, GlobalMaxPooling1D
 from keras.layers import Dense, Dropout, Concatenate, Input
 from keras.models import Model
-
 from keras.callbacks import EarlyStopping
 from keras.layers import SpatialDropout1D
 
-
-def initialize_model(sequence_length, vocab_size):
+def initialize_model(sequence_length,
+                     vocab_size,
+                     embedding_dim=128):
     """
     Initialize & compile CNN Model
     """
-    embedding_dim = 128
+
+    embedding_dim = embedding_dim
 
     input_layer = Input(shape=(sequence_length,))
     embedding = Embedding(vocab_size, embedding_dim)(input_layer)
@@ -41,21 +42,26 @@ def initialize_model(sequence_length, vocab_size):
 
     return model_CD
 
-def train_model(model, X, y):
+def train_model(model,
+                X,
+                y,
+                patience=2,
+                epochs=15,
+                validation_split=0.3,
+                batch_size=100):
+
     """
     Fit the model
     """
 
-    early_stop = EarlyStopping(
-        patience=2,
-        restore_best_weights=True,
-        verbose=0
-    )
+    early_stop = EarlyStopping(patience=patience,
+                               restore_best_weights=True)
 
-    history = model.fit(X, y, epochs=15, validation_split=0.3, batch_size=100,
-        shuffle=True,
-        callbacks=[early_stop],
-        verbose=0
-    )
+    history = model.fit(X, y,
+                               epochs=epochs,
+                               validation_split=validation_split,
+                               batch_size=batch_size,
+                               shuffle=True,
+                               callbacks=[early_stop])
 
     return model, history.history
