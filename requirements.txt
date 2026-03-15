@@ -37,7 +37,9 @@ ipywidgets
 sentence_transformers
 gensim
 
-#Topics research
-bertopics
-torch
+# Topics research
+bertopic>=0.17.4
+hdbscan>=0.8.32
+umap-learn>=0.5.4
 wordcloud
+vaderSentiment

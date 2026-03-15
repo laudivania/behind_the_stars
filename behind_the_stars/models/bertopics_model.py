@@ -2,14 +2,27 @@
 from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import pandas as pd
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
+
+#Predefining a list of seed topics
+seed_topics_list = [["food","taste","delicious","flavor","dish","meal"],
+["service","staff","waiter","friendly","rude","attentive"],
+["slow","wait","long","minutes","quick","fast"],
+["price","expensive","cheap","value","overpriced"],
+["wrong","order","missing","incorrect"],
+["clean","dirty","bathroom","hygiene"],
+["atmosphere","music","loud","quiet","ambiance"],
+["parking","location","downtown"],
+["manager","management","organized","chaotic"],
+["portion","small","large","size"]]
 
 # BerTopics model
-def bertopics_model(text,
+def bertopic_model(text,
                     embedding_model="all-MiniLM-L6-v2",
                     nr_topics=None,
                     min_topic_size=20,
-                    seed_topic_list=None,
+                    seed_topic_list=seed_topics_list,
                     random_state=42):
     """Embed the model and have topics as output"""
     embedding_model= SentenceTransformer(embedding_model)
@@ -42,9 +55,22 @@ def print_bertopic_topics(topic_model, n_words=10):
         print(f"Topic {topic_num}: {', '.join(words)}\n")
 
 
+#Defining a list of topics to be explored
+topic_labels = {
+    0: "food_quality",
+    1: "service",
+    2: "waiting_time",
+    3: "price_value",
+    4: "order_accuracy",
+    5: "cleanliness",
+    6: "atmosphere",
+    7: "location_access",
+    8: "management",
+    9: "portion_size"}
+
 #Convert each topic into feature
 def bertopic_features(df, text, topic_model, topics,
-                      custom_topic_labels=None,
+                      custom_topic_labels=topic_labels,
                       top_words=2):
     """ Convert each topic into a feature, and choose
     the topics we want to model to converge around
@@ -89,7 +115,90 @@ def bertopic_features(df, text, topic_model, topics,
     df_features = pd.concat(
         [df_features.reset_index(drop=True),
          probs_df.reset_index(drop=True)],
-        axis=1
-    )
+        axis=1)
 
     return df_features
+
+
+
+def add_restaurant_topic_features(df, text_col="text_cleaned",
+                                  restaurant_col="business_id", topic_col="topic_main"):
+    """
+    Build a restaurant-level dataset combining:
+    - original business dataset (target, metadata)
+    - aggregated sentiment features (sentiment per review, negative reviews,
+    average sentiment per topic)
+    - topic sentiment
+    - topic volume
+    The columns `sentiment_X` and `topic_volume_X` are placed side by side to facilitate analysis.
+    Returns:
+    dataframe with one row per restaurant
+    """
+
+    # Keep the original columns
+    restaurant_base = df.drop_duplicates(subset=restaurant_col)
+
+    df = df.copy()
+    analyzer = SentimentIntensityAnalyzer()
+
+    # Sentiment per review
+    df["sentiment"] = df[text_col].apply(lambda x: analyzer.polarity_scores(str(x))["compound"])
+
+    # Select the negative reviews
+    df["negative_review"] = df["sentiment"] < -0.05
+
+    # Aggregate restaurants, calculate the average sentiment and negative reviews and count the number of topics per restaurant
+    agg_global = df.groupby(restaurant_col).agg(
+        avg_sentiment=("sentiment", "mean"),
+        negative_review_ratio=("negative_review", "mean"),
+        review_count=(text_col, "count")).reset_index()
+
+    # Merge global and aggregated df
+    df = df.merge(agg_global, on=restaurant_col, how="left")
+
+    # Compute average sentiment per topic, in order to know how it affect restaurants
+    topic_sentiment = (
+        df.groupby([restaurant_col, topic_col])["sentiment"]
+        .mean()
+        .unstack()
+        .add_prefix("sentiment_")
+        .reset_index())
+
+    # volume (proportion) per topic
+    topic_count = (
+        df.groupby([restaurant_col, topic_col]).size()
+        .unstack()
+        .fillna(0)
+        .reset_index())
+
+    # Normalization based on the total of reviews per restaurant
+    total_reviews = df.groupby(restaurant_col)[text_col].count().reset_index(name="total_reviews")
+    topic_volume = topic_count.merge(total_reviews, on=restaurant_col)
+
+    topic_cols = [c for c in topic_count.columns if c != restaurant_col]
+    for c in topic_cols:
+        topic_volume[c] = topic_volume[c] / topic_volume["total_reviews"]
+    topic_volume = topic_volume.drop(columns=["total_reviews"]).add_prefix("topic_volume_")
+    topic_volume = topic_volume.rename(columns={f"topic_volume_{restaurant_col}": restaurant_col})
+
+    # Merge sentiment and volume
+    topic_features = topic_sentiment.merge(topic_volume, on=restaurant_col, how="outer")
+
+    # Reorganise columns: sentiment_X / topic_volume_X side by side
+    cols_ordered = [restaurant_col]
+    topics = [c.replace("sentiment_", "") for c in topic_sentiment.columns if c.startswith("sentiment_")]
+    for t in topics:
+        cols_ordered.append(f"sentiment_{t}")
+        cols_ordered.append(f"topic_volume_{t}")
+    topic_features = topic_features[cols_ordered]
+
+    # Merge all restaurant features
+    restaurant_features = agg_global.merge(topic_features, on=restaurant_col, how="left")
+
+    # Merge with original business dataset (target, metadata)
+    df_business = restaurant_base.merge(restaurant_features, on=restaurant_col, how="left")
+
+    # Fill missing topics
+    df_business = df_business.fillna(0)
+
+    return df_business
