@@ -33,6 +33,8 @@ keras
 # Computer performance for review analysis
 pandarallel
 ipywidgets
+tqdm
+joblib
 
 # Embeddings
 sentence_transformers
