@@ -14,13 +14,15 @@ from nltk.stem import WordNetLemmatizer
 from langdetect import detect, DetectorFactory
 from sklearn.feature_extraction.text import CountVectorizer
 
-
-
 import string
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+
+from wordcloud import WordCloud
+
+#---------------------------- End of libraries -------------------------
 
 
 # Initialisation une seule fois
@@ -257,3 +259,14 @@ def get_vectorizer(X_preproc, vocab_size=3000, output_sequence_length=None):
     X_vect = vectorizer(X_preproc).numpy()
 
     return X_vect
+
+#-------------------------------- End of Vectorizers---------------------------
+
+#Create a word cloud
+def word_cloud (text:str, max_words, background_color="white"):
+    wordcloud = WordCloud(background_color=background_color,
+                          max_words=max_words).generate(text)
+    display = plt.imshow(wordcloud, interpolation='bilinear')
+    display= plt.axis("off")
+    display= plt.show()
+    return display

@@ -24,6 +24,7 @@ regex
 # Deployment
 streamlit
 ipykernel
+fastapi
 
 #Deeplearning
 tensorflow
@@ -37,6 +38,21 @@ ipywidgets
 sentence_transformers
 gensim
 
-#Topics research
-bertopics
-torch
+# Topics research
+bertopic>=0.17.4
+hdbscan>=0.8.32
+umap-learn>=0.5.4
+wordcloud
+vaderSentiment
+
+#User interface
+streamlit
+
+# API
+fastapi         # API framework
+pytz            # time zone management
+uvicorn         # web server
+
+# tests
+httpx           # HTTP client
+pytest-asyncio  # asynchronous I/O support for pytest
