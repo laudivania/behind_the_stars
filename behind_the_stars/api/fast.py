@@ -20,4 +20,16 @@ def root():
     return {'greeting': 'Hello'}
 
 
-#@app.get("/predict")
+# @app.get("/predict")
+# def predict(
+#         restaurant : str
+#     ):      # 1
+#     """
+#     given a number of reviews (up to one hundred), predict the likelyhood of closure
+#     """
+#     df = get_data()
+#     X_pred = df[df['restaurant']==restaurant]['text'].tolist()
+#     X_vect = vectorizer(X_pred)
+#     y_pred = app.state.model.predict(X_vect)
+#     proba = {'closure likelyhood' : float(y_pred)}
+#     return proba
