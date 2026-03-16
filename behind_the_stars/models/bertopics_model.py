@@ -3,8 +3,7 @@ from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
-
+import joblib
 #Predefining a list of seed topics
 seed_topics_list = [["food","taste","delicious","flavor","dish","meal"],
 ["service","staff","waiter","friendly","rude","attentive"],
@@ -26,7 +25,6 @@ def bertopic_model(text,
                     random_state=42):
     """Embed the model and have topics as output"""
     embedding_model= SentenceTransformer(embedding_model)
-
     topic_model= BERTopic(
         embedding_model=embedding_model,
         nr_topics=nr_topics,
@@ -34,6 +32,8 @@ def bertopic_model(text,
         seed_topic_list=seed_topic_list)  # the topics we want the model to converge around
 
     topics, probs = topic_model.fit_transform(text)
+
+    joblib.dump(topic_model,'model_saved/bertopic.pkl')
 
     return topics, probs, topic_model
 

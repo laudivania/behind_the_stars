@@ -32,6 +32,9 @@ def process_embed_bert(list_reviews):
     return mean_embedding
 
 def embedding_bert(reviews_list,output_path):
+    '''Fonction gérant l'embedding, ainsi que l'enregistrement de ses derniers.
+        reviews_list = Liste de reviews du resto
+        output_path = Chemin d'enregistrement (à adapter pour enregistrer où on veut)'''
     model = get_bert_model()
     if os.path.exists(output_path):
         results = joblib.load(output_path)
