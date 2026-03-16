@@ -185,17 +185,10 @@ def master_preprocessor(text: str):
 
 # Execution
 
-<<<<<<< HEAD:ml_logic/preprocessor.py
-#print("Working on reviews...")
-# We use pandarallel to optimize process' performance.
-#results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
-#df[['text_cleaned', 'is_junk']] = results
-=======
 # print("Working on reviews...")
 # We use pandarallel to optimize process' performance.
 # results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
 # df[['text_cleaned', 'is_junk']] = results
->>>>>>> 1ef46c42e5b552c70d82dd32b9b4b4f2b75c894a:behind_the_stars/ml_logic/preprocessor.py
 
 #-------------- End Master Preprocessing before Vectorizing -----------
 
