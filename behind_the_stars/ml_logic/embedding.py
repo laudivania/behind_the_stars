@@ -3,6 +3,8 @@ import numpy as np
 from preprocessor import fine_cleaning
 from gensim.models import Word2Vec
 from tensorflow.keras.preprocessing.text import text_to_word_sequence
+from transformers import AutoTokenizer, TFAutoModel
+import tensorflow as tf
 
 
 _BERT_MODEL = None
@@ -72,9 +74,12 @@ if __name__=='__main__':
     print(f"Shape Word2Vec: {embed2vec.shape}")
 
 
-def embedding_by_batch(df,tokenizer, model):
+def embedding_by_batch(df,tokenizer='tiny_bert', model='tiny_bert'):
     batch_size = 512  # à ajuster selon ta RAM/GPU
     embeddings_batches = []
+    if tokenizer == 'tiny_bert':
+        tokenizer = AutoTokenizer.from_pretrained("prajjwal1/bert-tiny", dtype="auto", padding = "right")
+        model = TFAutoModel.from_pretrained("prajjwal1/bert-tiny", from_pt = True)
 
     for start in range(0, len(df), batch_size):
         end = start + batch_size
