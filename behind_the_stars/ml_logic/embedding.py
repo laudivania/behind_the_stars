@@ -3,7 +3,10 @@ import numpy as np
 from preprocessor import fine_cleaning
 from gensim.models import Word2Vec
 from tensorflow.keras.preprocessing.text import text_to_word_sequence
-
+from transformers import AutoTokenizer, TFAutoModel
+import tensorflow as tf
+import os
+import joblib
 
 _BERT_MODEL = None
 
@@ -26,6 +29,40 @@ def process_embed_bert(list_reviews):
     mean_embedding = np.mean(review_embed,axis=0)
 
     return mean_embedding
+
+def embedding_bert(reviews_list,output_path):
+    model = get_bert_model()
+    if os.path.exists(output_path):
+        results = joblib.load(output_path)
+        print(f"Checkpoint trouvé : {len(results)} restos déjà traités")
+    else:
+        results = {}
+        print("Pas de checkpoint, start from scratch")
+
+    data_to_process = reviews_list.to_dict('records')
+    for i, row in enumerate(tqdm(data_to_process)):
+        bid = row['business_id']
+
+        if bid in results:
+            continue
+
+        reviews = row['text']
+        clean_reviews = [fine_cleaning(r) for r in reviews if isinstance(r, str) and len(r) > 2]
+
+        if not clean_reviews:
+            results[bid] = np.zeros(384)
+            continue
+
+        embeddings = model.encode(clean_reviews, batch_size=64, show_progress_bar=False)
+
+        results[bid] = np.mean(embeddings, axis=0)
+
+        if (i + 1) % 200 == 0:
+            joblib.dump(results, output_path)
+
+    joblib.dump(results, output_path)
+    print(f"\n Terminé : {len(results)} restos sont sauvegardés.")
+    return results
 
 def process_embed_word2vec(list_reviews_seq, model):
     ''' Fonction renvoyant la moyenne de l'embedding d'une liste de reviews (par resto)
@@ -70,3 +107,34 @@ if __name__=='__main__':
 
     embed2vec = process_embed_word2vec(word_seq,model)
     print(f"Shape Word2Vec: {embed2vec.shape}")
+
+
+def embedding_by_batch(df,tokenizer='tiny_bert', model='tiny_bert'):
+    batch_size = 512  # à ajuster selon ta RAM/GPU
+    embeddings_batches = []
+    if tokenizer == 'tiny_bert':
+        tokenizer = AutoTokenizer.from_pretrained("prajjwal1/bert-tiny", dtype="auto", padding = "right")
+        model = TFAutoModel.from_pretrained("prajjwal1/bert-tiny", from_pt = True)
+
+    for start in range(0, len(df), batch_size):
+        end = start + batch_size
+        batch_texts = df['text'].iloc[start:end].apply(lambda x: ' '.join(x)).tolist()
+
+        # Tokenize
+        encodings = tokenizer(batch_texts,
+                            padding=True,
+                            truncation=True,
+                            max_length=512,
+                            return_tensors='tf')
+
+        # Embedding BERT
+        outputs = model(encodings['input_ids'], attention_mask=encodings['attention_mask'])
+        # Utiliser le [CLS] token ou la moyenne des tokens
+        cls_embeddings = outputs.last_hidden_state[:, 0, :]  # shape: (batch_size, hidden_size)
+
+        embeddings_batches.append(cls_embeddings)
+
+    # Combiner tous les batches
+    embeddings = tf.concat(embeddings_batches, axis=0)
+    print(embeddings.shape)  # (34562, 128) si BERT-tiny
+    return embeddings
