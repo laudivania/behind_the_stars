@@ -5,7 +5,9 @@ from gensim.models import Word2Vec
 from tensorflow.keras.preprocessing.text import text_to_word_sequence
 from transformers import AutoTokenizer, TFAutoModel
 import tensorflow as tf
-
+import os
+import joblib
+import tqdm
 
 _BERT_MODEL = None
 
@@ -28,6 +30,43 @@ def process_embed_bert(list_reviews):
     mean_embedding = np.mean(review_embed,axis=0)
 
     return mean_embedding
+
+def embedding_bert(reviews_list,output_path):
+    '''Fonction gérant l'embedding, ainsi que l'enregistrement de ses derniers.
+        reviews_list = Liste de reviews du resto
+        output_path = Chemin d'enregistrement (à adapter pour enregistrer où on veut)'''
+    model = get_bert_model()
+    if os.path.exists(output_path):
+        results = joblib.load(output_path)
+        print(f"Checkpoint trouvé : {len(results)} restos déjà traités")
+    else:
+        results = {}
+        print("Pas de checkpoint, start from scratch")
+
+    data_to_process = reviews_list.to_dict('records')
+    for i, row in enumerate(tqdm(data_to_process)):
+        bid = row['business_id']
+
+        if bid in results:
+            continue
+
+        reviews = row['text']
+        clean_reviews = [fine_cleaning(r) for r in reviews if isinstance(r, str) and len(r) > 2]
+
+        if not clean_reviews:
+            results[bid] = np.zeros(384)
+            continue
+
+        embeddings = model.encode(clean_reviews, batch_size=64, show_progress_bar=False)
+
+        results[bid] = np.mean(embeddings, axis=0)
+
+        if (i + 1) % 200 == 0:
+            joblib.dump(results, output_path)
+
+    joblib.dump(results, output_path)
+    print(f"\n Terminé : {len(results)} restos sont sauvegardés.")
+    return results
 
 def process_embed_word2vec(list_reviews_seq, model):
     ''' Fonction renvoyant la moyenne de l'embedding d'une liste de reviews (par resto)

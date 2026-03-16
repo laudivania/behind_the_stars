@@ -3,7 +3,7 @@ from keras.layers import Dense, Dropout, Concatenate, Input
 from keras.models import Model
 from keras.callbacks import EarlyStopping
 from keras.layers import SpatialDropout1D
-
+import joblib
 def initialize_model(sequence_length,
                      vocab_size,
                      embedding_dim=128):
@@ -63,5 +63,7 @@ def train_model(model,
                                batch_size=batch_size,
                                shuffle=True,
                                callbacks=[early_stop])
+
+    joblib.dump(model,'model_saved/cnndp.pkl')
 
     return model, history.history

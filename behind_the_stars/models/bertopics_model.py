@@ -3,8 +3,7 @@ from bertopic import BERTopic
 from sentence_transformers import SentenceTransformer
 import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
-
+import joblib
 #Predefining a list of seed topics
 seed_topics_list = [["food","taste","delicious","flavor","dish","meal"],
 ["service","staff","waiter","friendly","rude","attentive"],
@@ -26,7 +25,6 @@ def bertopic_model(text,
                     random_state=42):
     """Embed the model and have topics as output"""
     embedding_model= SentenceTransformer(embedding_model)
-
     topic_model= BERTopic(
         embedding_model=embedding_model,
         nr_topics=nr_topics,
@@ -34,6 +32,8 @@ def bertopic_model(text,
         seed_topic_list=seed_topic_list)  # the topics we want the model to converge around
 
     topics, probs = topic_model.fit_transform(text)
+
+    joblib.dump(topic_model,'model_saved/bertopic.pkl')
 
     return topics, probs, topic_model
 
@@ -120,28 +120,33 @@ def bertopic_features(df, text, topic_model, topics,
     return df_features
 
 
-
 def add_restaurant_topic_features(df, text_col="text_cleaned",
-                                  restaurant_col="business_id", topic_col="topic_main"):
+                                  restaurant_col="business_id", topic_col="topic_main", date_col ="date"):
     """
     Build a restaurant-level dataset combining:
     - original business dataset (target, metadata)
-    - aggregated sentiment features (sentiment per review, negative reviews,
-    average sentiment per topic)
+    - aggregated sentiment features
     - topic sentiment
     - topic volume
-    The columns `sentiment_X` and `topic_volume_X` are placed side by side to facilitate analysis.
+    - temporal features (sentiment trend and review growth)
+
     Returns:
-    dataframe with one row per restaurant
+        dataframe with one row per restaurant
     """
+
+    #A copy of the original df
+    df = df.copy()
+
+    #Formating date
+    df[date_col] = pd.to_datetime(df[date_col])
 
     # Keep the original columns
     restaurant_base = df.drop_duplicates(subset=restaurant_col)
 
-    df = df.copy()
+    #Instantiation of the sentiment analyzer
     analyzer = SentimentIntensityAnalyzer()
 
-    # Sentiment per review
+    # Sentiment per review (applying analyzer)
     df["sentiment"] = df[text_col].apply(lambda x: analyzer.polarity_scores(str(x))["compound"])
 
     # Select the negative reviews

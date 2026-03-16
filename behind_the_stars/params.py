@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
 
-#GCP
+##################  VARIABLES  ##################
 GCP_PROJECT = os.environ.get("GCP_PROJECT")
 GCP_REGION = os.environ.get("GCP_REGION")
+
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 MODEL_TARGET = os.environ.get("MODEL_TARGET")
 
