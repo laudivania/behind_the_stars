@@ -24,6 +24,7 @@ regex
 # Deployment
 streamlit
 ipykernel
+fastapi
 
 #Deeplearning
 tensorflow
