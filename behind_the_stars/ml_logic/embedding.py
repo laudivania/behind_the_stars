@@ -70,3 +70,31 @@ if __name__=='__main__':
 
     embed2vec = process_embed_word2vec(word_seq,model)
     print(f"Shape Word2Vec: {embed2vec.shape}")
+
+
+def embedding_by_batch(df,tokenizer, model):
+    batch_size = 512  # à ajuster selon ta RAM/GPU
+    embeddings_batches = []
+
+    for start in range(0, len(df), batch_size):
+        end = start + batch_size
+        batch_texts = df['text'].iloc[start:end].apply(lambda x: ' '.join(x)).tolist()
+
+        # Tokenize
+        encodings = tokenizer(batch_texts,
+                            padding=True,
+                            truncation=True,
+                            max_length=512,
+                            return_tensors='tf')
+
+        # Embedding BERT
+        outputs = model(encodings['input_ids'], attention_mask=encodings['attention_mask'])
+        # Utiliser le [CLS] token ou la moyenne des tokens
+        cls_embeddings = outputs.last_hidden_state[:, 0, :]  # shape: (batch_size, hidden_size)
+
+        embeddings_batches.append(cls_embeddings)
+
+    # Combiner tous les batches
+    embeddings = tf.concat(embeddings_batches, axis=0)
+    print(embeddings.shape)  # (34562, 128) si BERT-tiny
+    return embeddings
