@@ -7,6 +7,7 @@ from transformers import AutoTokenizer, TFAutoModel
 import tensorflow as tf
 import os
 import joblib
+import tqdm
 
 _BERT_MODEL = None
 
