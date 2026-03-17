@@ -7,6 +7,9 @@ from tensorflow import keras
 from behind_the_stars.params import *
 import mlflow
 from mlflow.tracking import MlflowClient
+import zipfile
+import joblib
+from sentence_transformers import SentenceTransformer
 
 
 ###------------------# Load functions #-----------------------###
@@ -53,6 +56,37 @@ def load_model():
         return model, vectorizer
 
     return None, None
+
+def load_embed():
+    """
+    Télécharge et charge le modèle SentenceTransformer depuis GCS
+    """
+    if MODEL_TARGET == "gcs":
+        client = storage.Client()
+        bucket = client.bucket(BUCKET_NAME)
+
+        # Chemins temporaires pour le zip et le dossier extrait
+        zip_path = "/tmp/bert_model.zip"
+        extract_path = "/tmp/bert_model_folder"
+
+        # 1. Téléchargement du fichier zip depuis GCS
+        # (Assure-toi d'avoir uploadé ton modèle zippé sous ce nom)
+        blob = bucket.blob("bert_model.zip")
+        blob.download_to_filename(zip_path)
+
+        # 2. Dézippage
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_path)
+
+        print("BERT model downloaded and extracted")
+
+        # 3. Chargement par SentenceTransformer
+        # Le modèle se charge en pointant vers le dossier extrait
+        model = SentenceTransformer(extract_path)
+        return model
+
+    # Fallback local pour tes tests
+    return SentenceTransformer('all-MiniLM-L6-v2')
 
 # def load_model_topics():
 #     """
