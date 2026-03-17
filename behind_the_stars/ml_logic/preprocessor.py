@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 import string
 import re
 from pandarallel import pandarallel
@@ -185,12 +187,46 @@ def master_preprocessor(text: str):
 
     return nlp_ready, junk_flag
 
-# Execution
+# Use clean_single_text and megatron_final when applied to a dataframe for demo.
 
-# print("Working on reviews...")
-# We use pandarallel to optimize process' performance.
-# results = df['text'].parallel_apply(lambda x: pd.Series(master_preprocessor(x)))
-# df[['text_cleaned', 'is_junk']] = results
+def clean_single_text(text, use_regex=True, remove_stopwords=True, use_lemmatizer=True):
+    """Applied to a text, it allows cleaning before applying a model."""
+    if isinstance(text, (list, np.ndarray)):
+        text = " ".join([str(item) for item in text if item is not None])
+
+    if not isinstance(text, str) or text.strip() == "":
+        return ""
+
+    if use_regex:
+        text = fine_cleaning(text)
+
+    text = basic_cleaning(text)
+
+    if remove_stopwords or use_lemmatizer:
+        tokens = word_tokenize(text)
+
+        if remove_stopwords:
+            tokens = [w for w in tokens if w not in stop_words]
+
+        if use_lemmatizer:
+            text = " ".join([lemmatizer.lemmatize(w) for w in tokens])
+        else:
+            text = " ".join(tokens)
+
+    return text
+
+def megatron_final(df, column_name='text', n_workers=8):
+    """ After text cleaning , it allows applying clean_single_text to a
+        dataset, choosing the column_name"""
+
+    pandarallel.initialize(nb_workers=n_workers, progress_bar=True)
+
+    print(f"Megatron processsing {len(df)} rows...")
+
+    df[column_name] = df[column_name].parallel_apply(clean_single_text)
+
+    print("Dataset ready for modelling.")
+    return df
 
 #-------------- End Master Preprocessing before Vectorizing -----------
 
