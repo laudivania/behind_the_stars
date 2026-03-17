@@ -1,0 +1,49 @@
+# Core Data Science
+pandas
+numpy
+scikit-learn
+xgboost
+
+# Data & GCP
+pyarrow
+fastparquet
+google-cloud-storage
+gcsfs
+python-dotenv
+
+# Visualization
+matplotlib
+seaborn
+
+# NLP
+textbook
+nltk
+langdetect
+regex
+vaderSentiment
+
+# Embeddings / Topics
+sentence_transformers
+gensim
+bertopic>=0.17.4
+hdbscan>=0.8.32
+umap-learn>=0.5.4
+wordcloud
+
+# Deep Learning (CPU only)
+tensorflow-cpu
+
+# Performance
+ipywidgets
+tqdm
+joblib
+
+# App / API
+streamlit
+fastapi
+uvicorn
+pytz
+
+# Tests
+httpx
+pytest-asyncio
