@@ -4,6 +4,7 @@ from preprocessor import fine_cleaning
 from gensim.models import Word2Vec
 from tensorflow.keras.preprocessing.text import text_to_word_sequence
 from transformers import AutoTokenizer, TFAutoModel
+from sklearn.metrics.pairwise import cosine_similarity
 import tensorflow as tf
 import os
 import joblib
@@ -83,6 +84,47 @@ def process_embed_word2vec(list_reviews_seq, model):
 
     return np.mean(review_vector,axis=0)
 
+
+def get_recommendations_for_new_resto(new_embedding, small_embeddings_dict, df_meta, top_n=5):
+    """
+    new_embedding : le vecteur (384,) généré en live pour le nouveau resto
+    small_embeddings_dict : ton dataset restreint d'embeddings {bid: vector}
+    df_meta : le dataframe contenant les noms/infos des restos du dataset restreint
+    """
+
+    target_vector = new_embedding.reshape(1, -1)
+
+    all_bids = list(small_embeddings_dict.keys())
+    all_vectors = np.array(list(small_embeddings_dict.values()))
+
+    scores = cosine_similarity(target_vector, all_vectors)[0]
+
+    best_indices = scores.argsort()[-top_n:][::-1]
+
+    recommendations = []
+
+    for idx in best_indices:
+        bid = all_bids[idx]
+        similarity = scores[idx]
+
+        match_info = df_meta[df_meta['business_id'] == bid]
+
+        if not match_info.empty:
+            name = match_info['name'].values[0]
+            city = match_info['city'].values[0]
+            state = match_info['state'].values[0]
+            resto_id = match_info['business_id'].values[0]
+            # print(f"[{similarity:.3f}] {name} ({city} - {state}) - {resto_id}")
+
+            recommendations.append({
+                "name": name,
+                "city": city,
+                "state": state,
+                "business_id": resto_id,
+                "similarity": similarity
+            })
+
+    return recommendations
 
 if __name__=='__main__':
 
