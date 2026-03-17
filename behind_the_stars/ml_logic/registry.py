@@ -35,13 +35,13 @@ def load_model():
         client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
 
-        # Temproary routes
-        model_path = "/tmp/xgb_model.pkl"
-        vec_path = "/tmp/tfidf_vectorizer.pkl"
+        # Temporary routes
+        model_path = "/tmp/xgb_model_final.pkl"
+        vec_path = "/tmp/tfidf_vectorizer_final.pkl"
 
         # Downloads from bucket
-        bucket.blob("xgb_model.pkl").download_to_filename(model_path)
-        bucket.blob("tfidf_vectorizer.pkl").download_to_filename(vec_path)
+        bucket.blob("xgb_model_final.pkl").download_to_filename(model_path)
+        bucket.blob("tfidf_vectorizer_final.pkl").download_to_filename(vec_path)
 
         # Loads with Pickle
         with open(model_path, 'rb') as f:
@@ -49,7 +49,7 @@ def load_model():
         with open(vec_path, 'rb') as f:
             vectorizer = pickle.load(f)
 
-        print("✅ Archivos pkl cargados exitosamente.")
+        print("pkl files succesfully downloaded")
         return model, vectorizer
 
     return None, None
