@@ -215,16 +215,18 @@ def clean_single_text(text, use_regex=True, remove_stopwords=True, use_lemmatize
 
     return text
 
-def megatron_final(df, column_name='text', n_workers=8):
+def megatron_final(df, column_name='text', use_regex=True, remove_stopwords=True, use_lemmatizer=True):
     """ After text cleaning , it allows applying clean_single_text to a
         dataset, choosing the column_name"""
 
-    pandarallel.initialize(nb_workers=n_workers, progress_bar=True)
-
     print(f"Megatron processsing {len(df)} rows...")
 
-    df[column_name] = df[column_name].parallel_apply(clean_single_text)
-
+    df[column_name] = df[column_name].apply(
+        clean_single_text,
+        use_regex=use_regex,
+        remove_stopwords=remove_stopwords,
+        use_lemmatizer=use_lemmatizer
+    )
     print("Dataset ready for modelling.")
     return df
 
