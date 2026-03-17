@@ -102,4 +102,5 @@ def get_reviews_by_column(data):
     iter['colonne'] = iter.groupby('business_id').cumcount()
     iter = iter[iter['colonne']<100]
     iter = iter.pivot(index='business_id', columns=['colonne'], values='text')
+    iter = iter.merge(data[['business_id','is_open']],on='business_id').drop_duplicates()
     return iter

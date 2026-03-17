@@ -31,7 +31,7 @@ tensorflow
 keras
 
 # Computer performance for review analysis
-pandarallel
+# pandarallel
 ipywidgets
 tqdm
 joblib
