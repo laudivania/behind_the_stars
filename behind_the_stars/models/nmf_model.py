@@ -1,7 +1,10 @@
 from sklearn.decomposition import NMF
 from pandarallel import pandarallel
 import joblib
+import os
 
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname, 'model_saved/nmf.pkl')
 pandarallel.initialize(progress_bar=True)
 
 
@@ -10,7 +13,7 @@ def nmf_model(vectorized_data,num_topics, random_state=None):
     on the document and the weight of the word on the sentence"""
     model = NMF (n_components=num_topics,random_state=random_state)
     nmf_matrix = model.fit_transform(vectorized_data)
-    joblib.dump(model,'model_saved/nmf.pkl')
+    joblib.dump(model,filename)
     return nmf_matrix, model
 
 
