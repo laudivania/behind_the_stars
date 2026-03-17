@@ -15,6 +15,10 @@ seed_topics_list = [["food","taste","delicious","flavor","dish","meal"],
 ["parking","location","downtown"],
 ["manager","management","organized","chaotic"],
 ["portion","small","large","size"]]
+import os
+
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname, 'model_saved/bertopics.pkl')
 
 # BerTopics model
 def bertopic_model(text,
@@ -33,7 +37,7 @@ def bertopic_model(text,
 
     topics, probs = topic_model.fit_transform(text)
 
-    joblib.dump(topic_model,'model_saved/bertopic.pkl')
+    joblib.dump(topic_model,filename)
 
     return topics, probs, topic_model
 

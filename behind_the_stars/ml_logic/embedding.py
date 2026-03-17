@@ -21,7 +21,7 @@ def process_embed_bert(list_reviews):
     ''' Fonction renvoyant la moyenne de l'embedding d'une liste de reviews (par resto)
     Moyenne des embeddings plutôt que CLS car ce transformer est fait pour mieux comprendre le contexte
     dans les phrases.
-    list_reviews: Une liste de reviews (par resto)
+    list_reviews: Une liste de reviews CLEAN (par resto)
 
     Retourne un array de la moyenne des embeddings (taille 384)'''
 

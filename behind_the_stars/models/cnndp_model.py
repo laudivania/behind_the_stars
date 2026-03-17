@@ -4,6 +4,11 @@ from keras.models import Model
 from keras.callbacks import EarlyStopping
 from keras.layers import SpatialDropout1D
 import joblib
+import os
+
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname, 'model_saved/cnndp.pkl')
+
 def initialize_model(sequence_length,
                      vocab_size,
                      embedding_dim=128):
@@ -64,6 +69,6 @@ def train_model(model,
                                shuffle=True,
                                callbacks=[early_stop])
 
-    joblib.dump(model,'model_saved/cnndp.pkl')
+    joblib.dump(model,filename)
 
     return model, history.history
