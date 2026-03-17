@@ -10,5 +10,13 @@ MODEL_TARGET = os.environ.get("MODEL_TARGET")
 
 DATA_FILENAME = os.environ.get("DATA_FILENAME")
 LOCAL_DATA_PATH = os.environ.get("LOCAL_DATA_PATH")
-#LOCAL_REGISTRY_PATH = os.path.expanduser(os.environ.get("LOCAL_REGISTRY_PATH"))
+
+
 RANDOM_STATE = 42
+
+# #MLflow and Prefect
+# MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
+# MLFLOW_EXPERIMENT = os.environ.get("MLFLOW_EXPERIMENT")
+# MLFLOW_MODEL_NAME = os.environ.get("MLFLOW_MODEL_NAME")
+
+GAR_IMAGE = os.environ.get("GAR_IMAGE")

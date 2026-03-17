@@ -20,7 +20,7 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {'greeting': 'Hello'}
+    return {'Welcome to the best project of batch #2195! :)'}
 
 
 @app.get("/predict")
