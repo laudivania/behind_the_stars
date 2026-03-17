@@ -90,6 +90,7 @@ def get_recommendations_for_new_resto(new_embedding, small_embeddings_dict, df_m
     new_embedding : le vecteur (384,) généré en live pour le nouveau resto
     small_embeddings_dict : ton dataset restreint d'embeddings {bid: vector}
     df_meta : le dataframe contenant les noms/infos des restos du dataset restreint
+    Retourne une liste de dictionnaires de top_n (int) restos similaires, sous le format {name,city,state,business_id,similarity}
     """
 
     target_vector = new_embedding.reshape(1, -1)
