@@ -5,8 +5,8 @@ from google.cloud import storage
 from behind_the_stars.params import *
 from tensorflow import keras
 from behind_the_stars.params import *
-import mlflow
-from mlflow.tracking import MlflowClient
+# import mlflow
+# from mlflow.tracking import MlflowClient
 
 
 ###------------------# Load functions #-----------------------###
