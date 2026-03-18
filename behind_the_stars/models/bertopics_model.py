@@ -6,19 +6,6 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # import joblib
 import os
 
-#Predefining a list of seed topics
-topics_list = [["food","taste","delicious","flavor","dish","meal"],
-["service","staff","waiter","friendly","rude","attentive"],
-["slow","wait","long","minutes","quick","fast"],
-["price","expensive","cheap","value","overpriced"],
-["wrong","order","missing","incorrect"],
-["clean","dirty","bathroom","hygiene"],
-["atmosphere","music","loud","quiet","ambiance"],
-["parking","location","downtown"],
-["manager","management","organized","chaotic"],
-["portion","small","large","size"]]
-
-
 
 # dirname = os.path.dirname(__file__)
 # filename = os.path.join(dirname, 'model_saved/bertopics.pkl')
@@ -26,11 +13,22 @@ topics_list = [["food","taste","delicious","flavor","dish","meal"],
 # BerTopics model
 def bertopic_model(text,
                     embedding_model="paraphrase-mpnet-base-v2",
-                    nr_topics=10,
-                    min_topic_size=20,
-                    seed_topic_list=seed_topics_list,
-                    random_state=42):
+                    nr_topics=5,
+                    min_topic_size=10):
     """Embed the model and have topics as output"""
+
+    #Predefining a list of seed topics
+    topics_list = [["food","taste","delicious","flavor","dish","meal"],
+    ["service","staff","waiter","friendly","rude","attentive"],
+    ["slow","wait","long","minutes","quick","fast"],
+    ["price","expensive","cheap","value","overpriced"],
+    ["wrong","order","missing","incorrect"],
+    ["clean","dirty","bathroom","hygiene"],
+    ["atmosphere","music","loud","quiet","ambiance"],
+    ["parking","location","downtown"],
+    ["manager","management","organized","chaotic"],
+    ["portion","small","large","size"]]
+
     embedding_model= SentenceTransformer(embedding_model)
     topic_model= BERTopic(
         embedding_model=embedding_model,
@@ -39,8 +37,6 @@ def bertopic_model(text,
         seed_topic_list=topics_list)  # the topics we want the model to converge around
 
     topics, probs = topic_model.fit_transform(text)
-
-    # joblib.dump(topic_model,filename)
 
     return topics, probs, topic_model
 
@@ -62,8 +58,15 @@ def print_bertopic_topics(topic_model, n_words=10):
         print(f"Topic {topic_num}: {', '.join(words)}\n")
 
 
-#Defining a list of topics to be explored
-topic_labels = {
+#Convert each topic into feature
+def bertopic_features(df, text, topic_model, topics,
+                      top_words=2):
+    """ Convert each topic into a feature, and choose
+    the topics we want to model to converge around
+    """
+
+    #Defining a list of topics to be explored
+    topic_labels_list = {
     0: "food_quality",
     1: "service",
     2: "waiting_time",
@@ -75,13 +78,6 @@ topic_labels = {
     8: "management",
     9: "portion_size"}
 
-#Convert each topic into feature
-def bertopic_features(df, text, topic_model, topics,
-                      custom_topic_labels=topic_labels,
-                      top_words=2):
-    """ Convert each topic into a feature, and choose
-    the topics we want to model to converge around
-    """
 
     # To have the probability of each topic on the review
     topic_distr, _ = topic_model.approximate_distribution(text)
@@ -97,8 +93,8 @@ def bertopic_features(df, text, topic_model, topics,
             continue
 
         # If a list of personalised topics is provided
-        if custom_topic_labels and topic in custom_topic_labels:
-            topic_labels[topic] = custom_topic_labels[topic]
+        if topic_labels_list and topic in topic_labels_list:
+            topic_labels[topic] = topic_labels_list[topic]
 
         else:
             words = topic_model.get_topic(topic)
