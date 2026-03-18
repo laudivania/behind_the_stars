@@ -10,6 +10,7 @@ fastparquet
 google-cloud-storage
 gcsfs
 python-dotenv
+zipfile
 
 
 # NLP - Sentiment analysis
