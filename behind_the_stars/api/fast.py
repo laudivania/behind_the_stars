@@ -78,6 +78,12 @@ async def predict_from_csv(data:  UploadFile = File(...)):
         proba = {'open likelyhood' : float(y_proba)}
     X_embed = np.mean(embed_model.encode(X_pred), axis=0)
     recommandation = get_recommendations_for_new_resto(X_embed, small_embed, small_df)
-    print(recommandation)
-    print(type(recommandation))
+    topic_df = megatron_final(topic_df, use_lemmatizer=False)
     return {'proba':proba , 'recommandation': recommandation}
+
+# @app.post("/api_topics/")
+# async def predict_from_csv(data:  UploadFile = File(...)):
+#     content = await data.read()
+#     topic_df = pd.read_csv(BytesIO(content))
+#     X_topic_pred = topic_df['text']
+#     X_topic_model = topic_model
