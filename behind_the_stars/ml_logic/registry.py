@@ -5,11 +5,13 @@ from google.cloud import storage
 from behind_the_stars.params import *
 from tensorflow import keras
 from behind_the_stars.params import *
-import mlflow
-from mlflow.tracking import MlflowClient
-import zipfile
-import joblib
-from sentence_transformers import SentenceTransformer
+# import mlflow
+# from mlflow.tracking import MlflowClient
+# import mlflow
+# from mlflow.tracking import MlflowClient
+# import zipfile
+# import joblib
+# from sentence_transformers import SentenceTransformer
 
 
 ###------------------# Load functions #-----------------------###

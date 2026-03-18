@@ -12,9 +12,6 @@ gcsfs
 python-dotenv
 zipfile
 
-# Dashboards
-matplotlib
-seaborn
 
 # NLP - Sentiment analysis
 textbook
@@ -26,9 +23,9 @@ regex
 streamlit
 ipykernel
 fastapi
+python-multipart
 
 #Deeplearning
-tensorflow
 keras
 
 # Computer performance for review analysis
