@@ -107,20 +107,17 @@ def get_recommendations_for_new_resto(new_embedding, small_embeddings_dict, df_m
     for idx in best_indices:
         bid = all_bids[idx]
         similarity = scores[idx]
-
+        similarity = float(round(similarity,2))
         match_info = df_meta[df_meta['business_id'] == bid]
-
         if not match_info.empty:
             name = match_info['name'].values[0]
-            city = match_info['city'].values[0]
-            state = match_info['state'].values[0]
+            # city = match_info['city'].values[0]
+            # state = match_info['state'].values[0]
             resto_id = match_info['business_id'].values[0]
-            print(f"[{similarity:.3f}] {name} ({city} - {state}) - {resto_id}")
+            print(f"[{similarity:.3f}] {name} - {resto_id}")
 
             recommendations.append({
                 "name": name,
-                "city": city,
-                "state": state,
                 "business_id": resto_id,
                 "similarity": similarity
             })
