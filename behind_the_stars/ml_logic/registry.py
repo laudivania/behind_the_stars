@@ -9,9 +9,9 @@ from behind_the_stars.params import *
 # from mlflow.tracking import MlflowClient
 # import mlflow
 # from mlflow.tracking import MlflowClient
-# import zipfile
+import zipfile
 # import joblib
-# from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 
 
 ###------------------# Load functions #-----------------------###
@@ -112,3 +112,22 @@ def load_embed():
 #         return model, vectorizer
 
 #     return None, None
+def load_small_dataset():
+    """
+    It charges the dataset from the bucket in GCS
+    """
+    if MODEL_TARGET == "gcs":
+        client = storage.Client()
+        bucket = client.bucket(BUCKET_NAME)
+
+        # Downloads demo_names.parquet
+        blob = bucket.blob("demo_names.parquet")
+        path_to_file = "/tmp/demo_names.parquet"
+        blob.download_to_filename(path_to_file)
+        small_df = pd.read_parquet(path_to_file)
+        small_df = small_df.head(50)
+        dic_fin = {"business_id":["DsQ-Fjv3fz3jd2bS1IR66w",  "3ow66MiTd-qSko4Y123aRQ", "u1HDWj6i_61KJDu_KiPT_Q", "Okk_HFzwzoZUXFP8QsP6rw", "TtyEDhjxOU60y0AE2pGdWg"],"text": ['a','b','c','d','e'], 'is_open':[1,1,1,1,1],'name':["Bertolini's Authentic Trattoria (King of Prussia - PA)","Un Caffe' Italian Bistro (Reno - NV)","Antonietta's Bistro (Runnemede - NJ)","Italian Pie (New Orleans - LA)","J F Sanfilippo's Italian Restaurant (Saint Louis - MO)"]}
+        test_df =pd.DataFrame(dic_fin)
+        final = pd.concat([small_df, test_df], ignore_index=True)
+        return final
+    return None

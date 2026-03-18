@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import string
 import re
-from pandarallel import pandarallel
+# from pandarallel import pandarallel
 from nltk import word_tokenize
 
 from nltk.corpus import stopwords

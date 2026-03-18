@@ -1,6 +1,6 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
-from preprocessor import fine_cleaning
+# from preprocessor import fine_cleaning
 from gensim.models import Word2Vec
 from tensorflow.keras.preprocessing.text import text_to_word_sequence
 from transformers import AutoTokenizer, TFAutoModel
@@ -115,7 +115,7 @@ def get_recommendations_for_new_resto(new_embedding, small_embeddings_dict, df_m
             city = match_info['city'].values[0]
             state = match_info['state'].values[0]
             resto_id = match_info['business_id'].values[0]
-            # print(f"[{similarity:.3f}] {name} ({city} - {state}) - {resto_id}")
+            print(f"[{similarity:.3f}] {name} ({city} - {state}) - {resto_id}")
 
             recommendations.append({
                 "name": name,
