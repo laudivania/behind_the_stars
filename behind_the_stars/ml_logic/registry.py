@@ -126,7 +126,7 @@ def load_small_dataset():
         blob.download_to_filename(path_to_file)
         small_df = pd.read_parquet(path_to_file)
         small_df = small_df.head(50)
-        dic_fin = {"business_id":["DsQ-Fjv3fz3jd2bS1IR66w",  "3ow66MiTd-qSko4Y123aRQ", "u1HDWj6i_61KJDu_KiPT_Q", "Okk_HFzwzoZUXFP8QsP6rw", "TtyEDhjxOU60y0AE2pGdWg"],"text": ['a','b','c','d','e'], 'is_open':[1,1,1,1,1],'name':["Bertolini's Authentic Trattoria (King of Prussia - PA)","Un Caffe' Italian Bistro (Reno - NV)","Antonietta's Bistro (Runnemede - NJ)","Italian Pie (New Orleans - LA)","J F Sanfilippo's Italian Restaurant (Saint Louis - MO)"]}
+        dic_fin = {"business_id":["s6Nb9L-4r9MkLPy07ajIeg",  "EKSmnS-fup3HNFLR9J17mQ", "cAgwUJ5oMhrm_WVbB0Q1Fg", "ZiEd4l1qEnLJFcF-K_3NgQ", "MnfAzLt3qp0CkMHuQF7cvg"],"text": ['a','b','c','d','e'], 'is_open':[1,1,1,1,1],'name':["Midtown II Restaurant","Quartermaster Store","Peppy Grill","Appetite's Delight","New Town Restaurant"]}
         test_df =pd.DataFrame(dic_fin)
         final = pd.concat([small_df, test_df], ignore_index=True)
         return final

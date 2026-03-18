@@ -78,4 +78,6 @@ async def predict_from_csv(data:  UploadFile = File(...)):
         proba = {'open likelyhood' : float(y_proba)}
     X_embed = np.mean(embed_model.encode(X_pred), axis=0)
     recommandation = get_recommendations_for_new_resto(X_embed, small_embed, small_df)
-    return proba, recommandation
+    print(recommandation)
+    print(type(recommandation))
+    return {'proba':proba , 'recommandation': recommandation}
