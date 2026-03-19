@@ -19,6 +19,7 @@ def load_dataset():
     """
     It charges the dataset from the bucket in GCS
     """
+
     if MODEL_TARGET == "gcs":
         client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
@@ -36,28 +37,33 @@ def load_model():
     """
     It charges model and vectorizer from GCS
     """
-    if MODEL_TARGET == "gcs":
-        client = storage.Client()
-        bucket = client.bucket(BUCKET_NAME)
+    print(MODEL_TARGET)
+    # if MODEL_TARGET == "gcs":
+    print('juste apres if model target')
+    client = storage.Client()
+    bucket = client.bucket(BUCKET_NAME)
+    print('juste apres instantiation model')
+    # Temporary routes
+    model_path = "/tmp/xgb_model_final.pkl"
+    vec_path = "/tmp/tfidf_vectorizer_final.pkl"
+    print('juste apres vec path')
+    # Downloads from bucket
+    bucket.blob("xgb_model_final.pkl").download_to_filename(model_path)
+    bucket.blob("tfidf_vectorizer_final.pkl").download_to_filename(vec_path)
+    print('no break here after bucket blob')
+    # Loads with Pickle
+    with open(model_path, 'rb') as f:
+        model = pickle.load(f)
+    print(model)
+    with open(vec_path, 'rb') as f:
+        vectorizer = pickle.load(f)
+    print(vectorizer)
+    print("pkl files succesfully downloaded")
+    assert model is not None
+    assert vectorizer is not None
+    return model, vectorizer
 
-        # Temporary routes
-        model_path = "/tmp/xgb_model_final.pkl"
-        vec_path = "/tmp/tfidf_vectorizer_final.pkl"
-
-        # Downloads from bucket
-        bucket.blob("xgb_model_final.pkl").download_to_filename(model_path)
-        bucket.blob("tfidf_vectorizer_final.pkl").download_to_filename(vec_path)
-
-        # Loads with Pickle
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
-        with open(vec_path, 'rb') as f:
-            vectorizer = pickle.load(f)
-
-        print("pkl files succesfully downloaded")
-        return model, vectorizer
-
-    return None, None
+    # return None, None
 
 def load_embed():
     """

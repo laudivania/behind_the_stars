@@ -12,7 +12,7 @@ from io import BytesIO
 import pickle as pkl
 import re
 # import joblib
-
+from behind_the_stars.params import *
 # from behind_the_stars.models.bertopics_model import master_topics
 # import joblib
 
@@ -20,7 +20,7 @@ app = FastAPI()
 small_df = load_small_dataset()
 model, vectorizer = load_model()
 embed_model = load_embed()
-with open('raw_data/pickle_embeddings.pkl', 'rb') as f:
+with open('/raw_data/pickle_embeddings.pkl', 'rb') as f:
     small_embed = pkl.load(f)
 
 # fonction regex

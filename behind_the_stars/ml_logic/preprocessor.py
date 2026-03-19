@@ -5,7 +5,11 @@ import string
 import re
 # from pandarallel import pandarallel
 from nltk import word_tokenize
-
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt_tab')  # For nltk>=3.9.0
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
