@@ -12,7 +12,7 @@ from io import BytesIO
 import pickle as pkl
 import re
 # import joblib
-
+from behind_the_stars.params import *
 # from behind_the_stars.models.bertopics_model import master_topics
 # import joblib
 
@@ -20,7 +20,7 @@ app = FastAPI()
 small_df = load_small_dataset()
 model, vectorizer = load_model()
 embed_model = load_embed()
-with open('raw_data/pickle_embeddings.pkl', 'rb') as f:
+with open('/raw_data/pickle_embeddings.pkl', 'rb') as f:
     small_embed = pkl.load(f)
 
 # fonction regex
@@ -102,7 +102,7 @@ async def predict_from_csv(data:  UploadFile = File(...)):
     # Explosion en lignes
     clean = clean.explode("text").reset_index(drop=True)
     print(clean)
-    topics, probs, topic_model = bertopic_model(clean['text'],nr_topics=2, min_topic_size=2)
+    topics, probs, topic_model = bertopic_model(clean['text'],nr_topics=4, min_topic_size=2)
     dataframe = bertopic_features(clean,clean['text'],topic_model,topics)
     last_etape = add_restaurant_topic_features(dataframe,text_col='text', restaurant_col='business_id', topic_col='topic_main', date_col='date')
     last_etape = last_etape.drop(["Unnamed: 0", "is_open"], axis=1)
